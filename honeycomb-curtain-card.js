@@ -563,26 +563,28 @@ class HoneycombCurtainCardEditor extends HTMLElement {
 
   _formSchema() {
     return [
-      { name: "name", selector: { text: {} } },
-      { name: "cover_top", selector: { entity: { domain: "cover" } } },
-      { name: "cover_bottom", selector: { entity: { domain: "cover" } } },
+      { name: "name", label: this._t("name"), selector: { text: {} } },
+      { name: "cover_top", label: this._t("top_motor"), selector: { entity: { domain: "cover" } } },
+      { name: "cover_bottom", label: this._t("bottom_motor"), selector: { entity: { domain: "cover" } } },
       {
-        name: "open",
-        type: "expandable",
-        title: this._t("open_position"),
-        schema: [
-          { name: "open_top", selector: { number: { min: 0, max: 100, mode: "box" } } },
-          { name: "open_bottom", selector: { number: { min: 0, max: 100, mode: "box" } } },
-        ],
+        name: "open_top",
+        label: `${this._t("open_position")} - ${this._t("top")}`,
+        selector: { number: { min: 0, max: 100, mode: "box" } },
       },
       {
-        name: "close",
-        type: "expandable",
-        title: this._t("close_position"),
-        schema: [
-          { name: "close_top", selector: { number: { min: 0, max: 100, mode: "box" } } },
-          { name: "close_bottom", selector: { number: { min: 0, max: 100, mode: "box" } } },
-        ],
+        name: "open_bottom",
+        label: `${this._t("open_position")} - ${this._t("bottom")}`,
+        selector: { number: { min: 0, max: 100, mode: "box" } },
+      },
+      {
+        name: "close_top",
+        label: `${this._t("close_position")} - ${this._t("top")}`,
+        selector: { number: { min: 0, max: 100, mode: "box" } },
+      },
+      {
+        name: "close_bottom",
+        label: `${this._t("close_position")} - ${this._t("bottom")}`,
+        selector: { number: { min: 0, max: 100, mode: "box" } },
       },
     ];
   }
