@@ -213,7 +213,7 @@ class HoneycombCurtainCard extends HTMLElement {
             margin-top: 14px;
           }
 
-          .action-btn {
+          .button {
             position: relative;
             flex: 1 1 120px;
             padding: 10px 14px;
@@ -227,7 +227,7 @@ class HoneycombCurtainCard extends HTMLElement {
             transition: transform 0.05s ease, box-shadow 0.2s ease;
           }
 
-          .action-btn ha-ripple {
+          .button ha-ripple {
             color: currentColor;
           }
 
@@ -405,7 +405,7 @@ class HoneycombCurtainCard extends HTMLElement {
 
     this._actionsEl.innerHTML = buttons.map((btn) => {
       const indexAttr = typeof btn.index === "number" ? ` data-index="${btn.index}"` : "";
-      return `<button type="button" class="action-btn" data-action="${btn.action}"${indexAttr}>${btn.label}<ha-ripple aria-hidden="true"></ha-ripple></button>`;
+      return `<button type="button" class="button" data-action="${btn.action}"${indexAttr}>${btn.label}<ha-ripple aria-hidden="true"></ha-ripple></button>`;
     }).join("");
   }
 
