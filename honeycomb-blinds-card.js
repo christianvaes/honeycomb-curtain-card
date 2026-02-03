@@ -1,4 +1,4 @@
-class HoneycombCurtainCard extends HTMLElement {
+class HoneycombBlindsCard extends HTMLElement {
   setConfig(config) {
     if (!config || !config.cover_top || !config.cover_bottom) {
       throw new Error("You must define 'cover_top' and 'cover_bottom'.");
@@ -54,14 +54,14 @@ class HoneycombCurtainCard extends HTMLElement {
   }
 
   static getConfigElement() {
-    return document.createElement("honeycomb-curtain-card-editor");
+    return document.createElement("honeycomb-blinds-card-editor");
   }
 
   static getStubConfig(hass) {
     const covers = Object.keys(hass.states).filter((id) => id.startsWith("cover."));
     return {
-      type: "custom:honeycomb-curtain-card",
-      name: "Honeycomb Gordijn",
+      type: "custom:honeycomb-blinds-card",
+      name: "Honeycomb Blinds",
       cover_top: covers[0] || "",
       cover_bottom: covers[1] || "",
     };
@@ -540,10 +540,10 @@ class HoneycombCurtainCard extends HTMLElement {
   }
 }
 
-customElements.define("honeycomb-curtain-card", HoneycombCurtainCard);
+customElements.define("honeycomb-blinds-card", HoneycombBlindsCard);
 
 
-class HoneycombCurtainCardEditor extends HTMLElement {
+class HoneycombBlindsCardEditor extends HTMLElement {
   _t(key) {
     const lang = (this._hass && this._hass.locale && this._hass.locale.language) ||
       (this._hass && this._hass.language) || "en";
@@ -858,11 +858,11 @@ class HoneycombCurtainCardEditor extends HTMLElement {
   }
 }
 
-customElements.define("honeycomb-curtain-card-editor", HoneycombCurtainCardEditor);
+customElements.define("honeycomb-blinds-card-editor", HoneycombBlindsCardEditor);
 
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: "honeycomb-curtain-card",
-  name: "Honeycomb Curtain Card",
+  type: "honeycomb-blinds-card",
+  name: "Honeycomb Blinds Card",
   description: "Control a two-motor honeycomb curtain (top + bottom).",
 });

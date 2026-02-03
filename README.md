@@ -1,4 +1,4 @@
-# Honeycomb Curtain Card
+# Honeycomb Blinds Card
 
 A Lovelace custom card to control a two-motor honeycomb curtain (top and bottom rails) in Home Assistant.
 
@@ -10,12 +10,12 @@ A Lovelace custom card to control a two-motor honeycomb curtain (top and bottom 
 
 ## Installation (HACS)
 1. Add this repository to HACS as a **Custom Repository** (type: **Dashboard**).
-2. Install **Honeycomb Curtain Card**.
+2. Install **Honeycomb Blinds Card**.
 3. Add the card to your dashboard (GUI or YAML).
 
 ## Usage (YAML)
 ```yaml
-type: custom:honeycomb-curtain-card
+type: custom:honeycomb-blinds-card
 name: Honeycomb Curtain
 cover_top: cover.top_motor
 cover_bottom: cover.bottom_motor
@@ -50,4 +50,4 @@ Default extra presets:
 
 ## Preview
 
-![Honeycomb Curtain Card - Middle preset](preview.png)
+![Honeycomb Blinds Card - Middle preset](preview.png)

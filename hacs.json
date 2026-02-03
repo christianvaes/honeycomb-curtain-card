@@ -1,6 +1,6 @@
 {
-  "name": "Honeycomb Curtain Card",
+  "name": "Honeycomb Blinds Card",
   "content_in_root": true,
   "render_readme": true,
-  "filename": "honeycomb-curtain-card.js"
+  "filename": "honeycomb-blinds-card.js"
 }
