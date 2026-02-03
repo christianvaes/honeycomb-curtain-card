@@ -16,6 +16,47 @@ class HoneycombCurtainCard extends HTMLElement {
     return 3;
   }
 
+  _t(key) {
+    const lang = (this._hass && this._hass.locale && this._hass.locale.language) ||
+      (this._hass && this._hass.language) || "en";
+    const dict = {
+      en: {
+        open: "Open",
+        close: "Close",
+        stop: "Stop",
+        topmotor: "Top motor",
+        bottommotor: "Bottom motor",
+        status: "Status",
+        preset: "Preset",
+        opening: "Opening",
+        closing: "Closing",
+        open_state: "Open",
+        closed_state: "Closed",
+        partial: "Partially open",
+        preset_middle: "Middle",
+        preset_bottom_closed: "Bottom closed",
+      },
+      nl: {
+        open: "Openen",
+        close: "Sluiten",
+        stop: "Stop",
+        topmotor: "Topmotor",
+        bottommotor: "Ondermotor",
+        status: "Status",
+        preset: "Stand",
+        opening: "Bezig met openen",
+        closing: "Bezig met sluiten",
+        open_state: "Open",
+        closed_state: "Gesloten",
+        partial: "Gedeeltelijk",
+        preset_middle: "Midden",
+        preset_bottom_closed: "Onderkant gesloten",
+      },
+    };
+    const table = dict[lang] || dict.en;
+    return table[key] || key;
+  }
+
   static getConfigElement() {
     return document.createElement("honeycomb-curtain-card-editor");
   }
@@ -175,13 +216,13 @@ class HoneycombCurtainCard extends HTMLElement {
           .btn {
             flex: 1 1 120px;
             padding: 10px 12px;
-            border-radius: 10px;
-            border: 1px solid #111111;
-            background: #111111;
-            color: #ffffff;
+            border-radius: var(--ha-card-border-radius, 12px);
+            border: 1px solid var(--divider-color, rgba(0, 0, 0, 0.2));
+            background: var(--primary-color);
+            color: var(--text-primary-color, #ffffff);
             font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            box-shadow: none;
             transition: transform 0.05s ease, box-shadow 0.2s ease;
           }
 
@@ -207,12 +248,11 @@ class HoneycombCurtainCard extends HTMLElement {
               <div class="bottom-rail"></div>
             </div>
             <div class="status">
-              <div>Topmotor: <strong id="top-pos">-</strong></div>
-              <div>Ondermotor: <strong id="bottom-pos">-</strong></div>
-              <div>Status: <strong id="status-text">-</strong></div>
+              <div><span id="label-top">Topmotor</span>: <strong id="top-pos">-</strong></div>
+              <div><span id="label-bottom">Ondermotor</span>: <strong id="bottom-pos">-</strong></div>
+              <div><span id="label-status">Status</span>: <strong id="status-text">-</strong></div>
             </div>
             <div class="actions" id="actions"></div>
-            <div class="hint">Tik op het plaatje om de dichtstbijzijnde rail te verplaatsen.</div>
           </div>
         </ha-card>
       `;
@@ -280,6 +320,10 @@ class HoneycombCurtainCard extends HTMLElement {
     this.shadowRoot.getElementById("status-text").textContent = this._statusText(topEntity, bottomEntity);
 
     this._renderActions();
+
+    this.shadowRoot.getElementById("label-top").textContent = this._t("topmotor");
+    this.shadowRoot.getElementById("label-bottom").textContent = this._t("bottommotor");
+    this.shadowRoot.getElementById("label-status").textContent = this._t("status");
   }
 
   _normalizeConfig(config) {
@@ -291,8 +335,8 @@ class HoneycombCurtainCard extends HTMLElement {
       close_top: 0,
       close_bottom: 0,
       presets: [
-        { name: "Midden", top: 46, bottom: 15, enabled: true },
-        { name: "Onderkant gesloten", top: 46, bottom: 0, enabled: true },
+        { name: this._t("preset_middle"), top: 46, bottom: 15, enabled: true },
+        { name: this._t("preset_bottom_closed"), top: 46, bottom: 0, enabled: true },
       ],
     };
 
@@ -314,7 +358,7 @@ class HoneycombCurtainCard extends HTMLElement {
 
   _normalizePreset(preset, fallback) {
     const base = {
-      name: typeof fallback.name === "string" ? fallback.name : "Stand",
+      name: typeof fallback.name === "string" ? fallback.name : this._t("preset"),
       top: this._sanitizePosition(fallback.top, 0),
       bottom: this._sanitizePosition(fallback.bottom, 0),
       enabled: fallback.enabled !== false,
@@ -343,12 +387,12 @@ class HoneycombCurtainCard extends HTMLElement {
     this._visiblePresets = presets;
 
     const buttons = [
-      { action: "open", label: "Openen" },
-      { action: "stop", label: "Stop" },
-      { action: "close", label: "Sluiten" },
+      { action: "open", label: this._t("open") },
+      { action: "stop", label: this._t("stop") },
+      { action: "close", label: this._t("close") },
       ...presets.map((preset, index) => ({
         action: "preset",
-        label: preset.name || `Stand ${index + 1}`,
+        label: preset.name || `${this._t("preset")} ${index + 1}`,
         index,
       })),
     ];
@@ -372,12 +416,12 @@ class HoneycombCurtainCard extends HTMLElement {
   }
 
   _statusText(topEntity, bottomEntity) {
-    if (!topEntity || !bottomEntity) return "Onbekend";
-    if (topEntity.state === "opening" || bottomEntity.state === "opening") return "Bezig met openen";
-    if (topEntity.state === "closing" || bottomEntity.state === "closing") return "Bezig met sluiten";
-    if (topEntity.state === "open" && bottomEntity.state === "open") return "Open";
-    if (topEntity.state === "closed" && bottomEntity.state === "closed") return "Gesloten";
-    return "Gedeeltelijk";
+    if (!topEntity || !bottomEntity) return "-";
+    if (topEntity.state === "opening" || bottomEntity.state === "opening") return this._t("opening");
+    if (topEntity.state === "closing" || bottomEntity.state === "closing") return this._t("closing");
+    if (topEntity.state === "open" && bottomEntity.state === "open") return this._t("open_state");
+    if (topEntity.state === "closed" && bottomEntity.state === "closed") return this._t("closed_state");
+    return this._t("partial");
   }
 
   _onSceneClick(ev) {
@@ -456,6 +500,47 @@ customElements.define("honeycomb-curtain-card", HoneycombCurtainCard);
 
 
 class HoneycombCurtainCardEditor extends HTMLElement {
+  _t(key) {
+    const lang = (this._hass && this._hass.locale && this._hass.locale.language) ||
+      (this._hass && this._hass.language) || "en";
+    const dict = {
+      en: {
+        name: "Name",
+        top_motor: "Top motor",
+        bottom_motor: "Bottom motor",
+        open_position: "Open position",
+        close_position: "Close position",
+        presets: "Extra presets",
+        add_preset: "Add preset",
+        new_preset: "New preset",
+        top: "Top",
+        bottom: "Bottom",
+        remove: "Remove",
+        preset: "Preset",
+        preset_middle: "Middle",
+        preset_bottom_closed: "Bottom closed",
+      },
+      nl: {
+        name: "Naam",
+        top_motor: "Bovenste motor",
+        bottom_motor: "Onderste motor",
+        open_position: "Openen positie",
+        close_position: "Sluiten positie",
+        presets: "Extra standen",
+        add_preset: "Stand toevoegen",
+        new_preset: "Nieuwe stand",
+        top: "Boven",
+        bottom: "Onder",
+        remove: "Verwijder",
+        preset: "Stand",
+        preset_middle: "Midden",
+        preset_bottom_closed: "Onderkant gesloten",
+      },
+    };
+    const table = dict[lang] || dict.en;
+    return table[key] || key;
+  }
+
   setConfig(config) {
     this._config = {
       name: "",
@@ -464,8 +549,8 @@ class HoneycombCurtainCardEditor extends HTMLElement {
       close_top: 0,
       close_bottom: 0,
       presets: [
-        { name: "Midden", top: 46, bottom: 15, enabled: true },
-        { name: "Onderkant gesloten", top: 46, bottom: 0, enabled: true },
+        { name: this._t("preset_middle"), top: 46, bottom: 15, enabled: true },
+        { name: this._t("preset_bottom_closed"), top: 46, bottom: 0, enabled: true },
       ],
       ...config,
     };
@@ -496,12 +581,9 @@ class HoneycombCurtainCardEditor extends HTMLElement {
             font-size: 0.9rem;
             color: var(--secondary-text-color);
           }
-          input, select {
-            padding: 8px 10px;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 0, 0, 0.2);
-            background: var(--card-background-color, #fff);
-            color: var(--primary-text-color);
+          ha-entity-picker,
+          ha-textfield {
+            width: 100%;
           }
           .split {
             display: grid;
@@ -510,52 +592,46 @@ class HoneycombCurtainCardEditor extends HTMLElement {
           }
           .preset {
             display: grid;
-            grid-template-columns: 1.4fr 0.7fr 0.7fr auto auto;
-            gap: 6px;
+            grid-template-columns: 1.5fr 0.8fr 0.8fr auto;
+            gap: 8px;
             align-items: center;
-          }
-          .preset input[type="text"] {
-            width: 100%;
           }
           .mini {
             padding: 6px 10px;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: var(--ha-card-border-radius, 12px);
+            border: 1px solid var(--divider-color, rgba(0, 0, 0, 0.2));
             background: var(--card-background-color, #fff);
             cursor: pointer;
           }
         </style>
         <div class="form">
           <div class="row">
-            <label for="name">Naam</label>
-            <input id="name" type="text" placeholder="Honeycomb Gordijn" />
+            <ha-textfield id="name" label=""></ha-textfield>
           </div>
           <div class="row">
-            <label for="cover_top">Bovenste motor (cover)</label>
-            <select id="cover_top"></select>
+            <ha-entity-picker id="cover_top" label=""></ha-entity-picker>
           </div>
           <div class="row">
-            <label for="cover_bottom">Onderste motor (cover)</label>
-            <select id="cover_bottom"></select>
+            <ha-entity-picker id="cover_bottom" label=""></ha-entity-picker>
           </div>
           <div class="row">
-            <label>Openen positie</label>
+            <label id="label-open">Open position</label>
             <div class="split">
-              <input id="open_top" type="number" min="0" max="100" placeholder="Boven" />
-              <input id="open_bottom" type="number" min="0" max="100" placeholder="Onder" />
+              <ha-textfield id="open_top" type="number" min="0" max="100" label=""></ha-textfield>
+              <ha-textfield id="open_bottom" type="number" min="0" max="100" label=""></ha-textfield>
             </div>
           </div>
           <div class="row">
-            <label>Sluiten positie</label>
+            <label id="label-close">Close position</label>
             <div class="split">
-              <input id="close_top" type="number" min="0" max="100" placeholder="Boven" />
-              <input id="close_bottom" type="number" min="0" max="100" placeholder="Onder" />
+              <ha-textfield id="close_top" type="number" min="0" max="100" label=""></ha-textfield>
+              <ha-textfield id="close_bottom" type="number" min="0" max="100" label=""></ha-textfield>
             </div>
           </div>
           <div class="row">
-            <label>Extra standen</label>
+            <label id="label-presets">Extra presets</label>
             <div id="presets"></div>
-            <button id="add-preset" class="mini" type="button">Stand toevoegen</button>
+            <button id="add-preset" class="mini" type="button"></button>
           </div>
         </div>
       `;
@@ -564,14 +640,13 @@ class HoneycombCurtainCardEditor extends HTMLElement {
         this._updateConfig({ name: e.target.value });
       });
 
-      this.shadowRoot.getElementById("cover_top").addEventListener("change", (e) => {
-        this._updateConfig({ cover_top: e.target.value });
+      this.shadowRoot.getElementById("cover_top").addEventListener("value-changed", (e) => {
+        this._updateConfig({ cover_top: e.detail.value });
       });
 
-      this.shadowRoot.getElementById("cover_bottom").addEventListener("change", (e) => {
-        this._updateConfig({ cover_bottom: e.target.value });
+      this.shadowRoot.getElementById("cover_bottom").addEventListener("value-changed", (e) => {
+        this._updateConfig({ cover_bottom: e.detail.value });
       });
-
 
       this.shadowRoot.getElementById("open_top").addEventListener("input", (e) => {
         this._updateConfig({ open_top: Number(e.target.value) });
@@ -591,7 +666,7 @@ class HoneycombCurtainCardEditor extends HTMLElement {
 
       this.shadowRoot.getElementById("add-preset").addEventListener("click", () => {
         const presets = Array.isArray(this._config.presets) ? [...this._config.presets] : [];
-        presets.push({ name: "Nieuwe stand", top: 0, bottom: 0, enabled: true });
+        presets.push({ name: this._t("new_preset"), top: 0, bottom: 0, enabled: true });
         this._updateConfig({ presets });
       });
     }
@@ -599,22 +674,34 @@ class HoneycombCurtainCardEditor extends HTMLElement {
     const nameInput = this.shadowRoot.getElementById("name");
     if (nameInput) nameInput.value = this._config.name || "";
 
-    const coverOptions = Object.keys(this._hass.states)
-      .filter((id) => id.startsWith("cover."))
-      .sort();
+    const topPicker = this.shadowRoot.getElementById("cover_top");
+    const bottomPicker = this.shadowRoot.getElementById("cover_bottom");
 
-    const topSelect = this.shadowRoot.getElementById("cover_top");
-    const bottomSelect = this.shadowRoot.getElementById("cover_bottom");
-
-    this._fillSelect(topSelect, coverOptions, this._config.cover_top || "");
-    this._fillSelect(bottomSelect, coverOptions, this._config.cover_bottom || "");
+    topPicker.hass = this._hass;
+    bottomPicker.hass = this._hass;
+    topPicker.includeDomains = ["cover"];
+    bottomPicker.includeDomains = ["cover"];
+    if (topPicker.value !== (this._config.cover_top || "")) topPicker.value = this._config.cover_top || "";
+    if (bottomPicker.value !== (this._config.cover_bottom || "")) bottomPicker.value = this._config.cover_bottom || "";
 
     this.shadowRoot.getElementById("open_top").value = this._config.open_top ?? 0;
     this.shadowRoot.getElementById("open_bottom").value = this._config.open_bottom ?? 0;
     this.shadowRoot.getElementById("close_top").value = this._config.close_top ?? 0;
     this.shadowRoot.getElementById("close_bottom").value = this._config.close_bottom ?? 0;
 
+    this.shadowRoot.getElementById("label-open").textContent = this._t("open_position");
+    this.shadowRoot.getElementById("label-close").textContent = this._t("close_position");
+    this.shadowRoot.getElementById("label-presets").textContent = this._t("presets");
+    this.shadowRoot.getElementById("add-preset").textContent = this._t("add_preset");
+
     this._renderPresets();
+    this.shadowRoot.getElementById("name").label = this._t("name");
+    this.shadowRoot.getElementById("cover_top").label = this._t("top_motor");
+    this.shadowRoot.getElementById("cover_bottom").label = this._t("bottom_motor");
+    this.shadowRoot.getElementById("open_top").label = this._t("top");
+    this.shadowRoot.getElementById("open_bottom").label = this._t("bottom");
+    this.shadowRoot.getElementById("close_top").label = this._t("top");
+    this.shadowRoot.getElementById("close_bottom").label = this._t("bottom");
   }
 
   _renderPresets() {
@@ -629,7 +716,7 @@ class HoneycombCurtainCardEditor extends HTMLElement {
 
       const name = document.createElement("input");
       name.type = "text";
-      name.value = preset.name || "Stand";
+      name.value = preset.name || this._t("preset");
       name.addEventListener("input", (e) => {
         const next = [...presets];
         next[index] = { ...next[index], name: e.target.value };
@@ -658,19 +745,10 @@ class HoneycombCurtainCardEditor extends HTMLElement {
         this._updateConfig({ presets: next });
       });
 
-      const enabled = document.createElement("input");
-      enabled.type = "checkbox";
-      enabled.checked = preset.enabled !== false;
-      enabled.addEventListener("change", (e) => {
-        const next = [...presets];
-        next[index] = { ...next[index], enabled: e.target.checked };
-        this._updateConfig({ presets: next });
-      });
-
       const remove = document.createElement("button");
       remove.className = "mini";
       remove.type = "button";
-      remove.textContent = "Verwijder";
+      remove.textContent = this._t("remove");
       remove.addEventListener("click", () => {
         const next = [...presets];
         next.splice(index, 1);
@@ -680,29 +758,9 @@ class HoneycombCurtainCardEditor extends HTMLElement {
       row.appendChild(name);
       row.appendChild(top);
       row.appendChild(bottom);
-      row.appendChild(enabled);
       row.appendChild(remove);
       container.appendChild(row);
     });
-  }
-
-  _fillSelect(selectEl, options, selected) {
-    if (!selectEl) return;
-    const current = selectEl.value;
-    selectEl.innerHTML = "";
-    const empty = document.createElement("option");
-    empty.value = "";
-    empty.textContent = "-- kies cover --";
-    selectEl.appendChild(empty);
-
-    options.forEach((id) => {
-      const opt = document.createElement("option");
-      opt.value = id;
-      opt.textContent = id;
-      selectEl.appendChild(opt);
-    });
-
-    selectEl.value = selected || current || "";
   }
 
   _updateConfig(changes) {
