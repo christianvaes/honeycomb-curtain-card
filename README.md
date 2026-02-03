@@ -50,4 +50,4 @@ Default extra presets:
 
 ## Preview
 
-![Honeycomb Curtain Card - Middle preset](preview-middle.svg)
+![Honeycomb Curtain Card - Middle preset](preview.png)
