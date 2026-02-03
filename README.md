@@ -1,9 +1,9 @@
 # Honeycomb Blinds Card
 
-A Lovelace custom card to control a two-motor honeycomb curtain (top and bottom rails) in Home Assistant.
+A Lovelace custom card to control a two-motor honeycomb blinds (top and bottom rails) in Home Assistant.
 
 ## Features
-- Stylized honeycomb curtain in hazel taupe with black top box and black bottom rail, in a window frame.
+- Stylized honeycomb blinds in hazel taupe with black top box and black bottom rail, in a window frame.
 - Shows current position of both motors and a visual status of the curtain.
 - Tap the image to move the nearest rail (configurable).
 - Buttons for Open, Stop, Close, plus optional extra presets.
@@ -16,7 +16,7 @@ A Lovelace custom card to control a two-motor honeycomb curtain (top and bottom 
 ## Usage (YAML)
 ```yaml
 type: custom:honeycomb-blinds-card
-name: Honeycomb Curtain
+name: Honeycomb Blinds
 cover_top: cover.top_motor
 cover_bottom: cover.bottom_motor
 ```
