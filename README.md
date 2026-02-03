@@ -37,13 +37,13 @@ cover_bottom: cover.onderste_motor
   - `bottom`: Always move the bottom rail.
 
 ## Behavior
-- **Open** button sets: top motor to 100%, bottom motor to 0%.
+- **Open** button sets: top motor to 0%, bottom motor to 100%.
 - **Stop** button sends `stop_cover` to both motors.
-- **Close** button sets: top motor to 0%, bottom motor to 100%.
+- **Close** button sets: top motor to 0%, bottom motor to 0%.
 
 ## Notes
 - Home Assistant uses positions from `0` to `100`. This card assumes:
-  - Top motor: `100 = fully up`, `0 = fully down`.
-  - Bottom motor: `0 = fully up`, `100 = fully down`.
+  - Top motor: `0 = fully up`, `100 = fully down`.
+  - Bottom motor: `0 = fully down`, `100 = fully up`.
 
 If your device reports differently, please let me know and I can add an inversion option.

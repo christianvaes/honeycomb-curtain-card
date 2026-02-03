@@ -66,11 +66,33 @@ class HoneycombCurtainCard extends HTMLElement {
             position: relative;
             width: var(--hc-width);
             height: var(--hc-height);
-            border-radius: 10px;
-            background: linear-gradient(180deg, #f7f4f0 0%, #f2ede6 100%);
-            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            background: #0f0f0f;
+            border: 1px solid rgba(0, 0, 0, 0.4);
             overflow: hidden;
             cursor: pointer;
+          }
+
+          .window {
+            position: absolute;
+            inset: 12px;
+            border-radius: 10px;
+            border: 6px solid var(--hc-black);
+            background: linear-gradient(180deg, #b9d0ea 0%, #d9e7f6 60%, #f4f8fd 100%);
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+          }
+
+          .window::after {
+            content: "";
+            position: absolute;
+            left: 10%;
+            top: 8%;
+            width: 45%;
+            height: 30%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0));
+            border-radius: 8px;
+            opacity: 0.7;
           }
 
           .top-box {
@@ -149,10 +171,12 @@ class HoneycombCurtainCard extends HTMLElement {
             flex: 1;
             padding: 10px 12px;
             border-radius: 10px;
-            border: 1px solid rgba(0, 0, 0, 0.12);
-            background: #ffffff;
+            border: 1px solid #111111;
+            background: #111111;
+            color: #ffffff;
             font-weight: 600;
             cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             transition: transform 0.05s ease, box-shadow 0.2s ease;
           }
 
@@ -160,12 +184,6 @@ class HoneycombCurtainCard extends HTMLElement {
             transform: translateY(1px);
           }
 
-          .btn.primary {
-            background: #111111;
-            color: white;
-            border-color: #111111;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-          }
 
           .hint {
             margin-top: 8px;
@@ -177,6 +195,7 @@ class HoneycombCurtainCard extends HTMLElement {
           <div class="card">
             <div class="title" id="title"></div>
             <div class="scene" id="scene">
+              <div class="window"></div>
               <div class="top-box"></div>
               <div class="top-rail"></div>
               <div class="shade"></div>
@@ -186,12 +205,11 @@ class HoneycombCurtainCard extends HTMLElement {
               <div>Topmotor: <strong id="top-pos">-</strong></div>
               <div>Ondermotor: <strong id="bottom-pos">-</strong></div>
               <div>Status: <strong id="status-text">-</strong></div>
-              <div>Opening: <strong id="open-span">-</strong></div>
             </div>
             <div class="actions">
-              <button class="btn" id="btn-open">Open</button>
+              <button class="btn" id="btn-open">Openen</button>
               <button class="btn" id="btn-stop">Stop</button>
-              <button class="btn primary" id="btn-close">Sluit</button>
+              <button class="btn" id="btn-close">Sluiten</button>
             </div>
             <div class="hint">Tik op het plaatje om de dichtstbijzijnde rail te verplaatsen.</div>
           </div>
@@ -199,7 +217,7 @@ class HoneycombCurtainCard extends HTMLElement {
       `;
 
       this.shadowRoot.getElementById("btn-open").addEventListener("click", () => {
-        this._setBoth(100, 0);
+        this._setBoth(0, 100);
       });
 
       this.shadowRoot.getElementById("btn-stop").addEventListener("click", () => {
@@ -207,7 +225,7 @@ class HoneycombCurtainCard extends HTMLElement {
       });
 
       this.shadowRoot.getElementById("btn-close").addEventListener("click", () => {
-        this._setBoth(0, 100);
+        this._setBoth(0, 0);
       });
 
       this.shadowRoot.getElementById("scene").addEventListener("click", (ev) => {
@@ -226,32 +244,26 @@ class HoneycombCurtainCard extends HTMLElement {
     const topEntity = this._hass.states[this._config.cover_top];
     const bottomEntity = this._hass.states[this._config.cover_bottom];
 
-    const topPos = this._getPosition(topEntity, 100);
+    const topPos = this._getPosition(topEntity, 0);
     const bottomPos = this._getPosition(bottomEntity, 0);
 
     const height = 240;
     const rail = 16;
     const maxDrop = height - rail;
 
-    let topY = (1 - topPos / 100) * maxDrop;
-    let bottomY = (bottomPos / 100) * maxDrop;
+    let topY = (topPos / 100) * maxDrop;
+    let bottomY = (1 - bottomPos / 100) * maxDrop;
 
-    topY = Math.max(0, Math.min(topY, maxDrop - rail));
-    bottomY = Math.max(rail, Math.min(bottomY, maxDrop));
-
-    const minGap = rail * 1.5;
-    if (bottomY < topY + minGap) bottomY = topY + minGap;
-    if (bottomY > maxDrop) bottomY = maxDrop;
+    topY = Math.max(0, Math.min(topY, maxDrop));
+    bottomY = Math.max(0, Math.min(bottomY, maxDrop));
+    if (bottomY < topY) bottomY = topY;
 
     const scene = this.shadowRoot.getElementById("scene");
     scene.style.setProperty("--top-y", `${topY}px`);
     scene.style.setProperty("--bottom-y", `${bottomY}px`);
 
-    const openSpan = Math.max(0, bottomY - topY) / maxDrop * 100;
-
     this.shadowRoot.getElementById("top-pos").textContent = `${Math.round(topPos)}%`;
     this.shadowRoot.getElementById("bottom-pos").textContent = `${Math.round(bottomPos)}%`;
-    this.shadowRoot.getElementById("open-span").textContent = `${Math.round(openSpan)}%`;
     this.shadowRoot.getElementById("status-text").textContent = this._statusText(topEntity, bottomEntity);
   }
 
@@ -286,33 +298,33 @@ class HoneycombCurtainCard extends HTMLElement {
     const tapAction = this._config.tap_action || "nearest";
 
     if (tapAction === "top") {
-      const topPos = 100 - (y / maxDrop) * 100;
+      const topPos = (y / maxDrop) * 100;
       this._setTop(topPos);
       return;
     }
 
     if (tapAction === "bottom") {
-      const bottomPos = (y / maxDrop) * 100;
+      const bottomPos = (1 - y / maxDrop) * 100;
       this._setBottom(bottomPos);
       return;
     }
 
     const topEntity = this._hass.states[this._config.cover_top];
     const bottomEntity = this._hass.states[this._config.cover_bottom];
-    const currentTop = this._getPosition(topEntity, 100);
+    const currentTop = this._getPosition(topEntity, 0);
     const currentBottom = this._getPosition(bottomEntity, 0);
 
-    const topY = (1 - currentTop / 100) * maxDrop;
-    const bottomY = (currentBottom / 100) * maxDrop;
+    const topY = (currentTop / 100) * maxDrop;
+    const bottomY = (1 - currentBottom / 100) * maxDrop;
 
     const distTop = Math.abs(y - topY);
     const distBottom = Math.abs(y - bottomY);
 
     if (distTop <= distBottom) {
-      const topPos = 100 - (y / maxDrop) * 100;
+      const topPos = (y / maxDrop) * 100;
       this._setTop(topPos);
     } else {
-      const bottomPos = (y / maxDrop) * 100;
+      const bottomPos = (1 - y / maxDrop) * 100;
       this._setBottom(bottomPos);
     }
   }
