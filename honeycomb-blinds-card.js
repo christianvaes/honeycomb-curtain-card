@@ -864,5 +864,5 @@ window.customCards = window.customCards || [];
 window.customCards.push({
   type: "honeycomb-blinds-card",
   name: "Honeycomb Blinds Card",
-  description: "Control a two-motor honeycomb curtain (top + bottom).",
+  description: "Control a two-motor honeycomb blinds (top + bottom).",
 });
