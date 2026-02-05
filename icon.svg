@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="glass" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#8aa8c7" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#dfe9f4" stop-opacity="0.85"/>
+    </linearGradient>
+    <pattern id="pleats" width="16" height="10" patternUnits="userSpaceOnUse">
+      <rect width="16" height="7" fill="#b9a38b"/>
+      <rect y="7" width="16" height="3" fill="#a89178"/>
+    </pattern>
+  </defs>
+  <rect x="12" y="16" width="232" height="224" rx="26" fill="#1f222a"/>
+  <rect x="28" y="32" width="200" height="192" rx="18" fill="#0f1116"/>
+  <rect x="40" y="44" width="176" height="168" rx="14" fill="url(#glass)" stroke="#111" stroke-width="6"/>
+
+  <!-- shade slightly overlaps frame -->
+  <rect x="42" y="98" width="172" height="10" rx="5" fill="#111"/>
+  <rect x="42" y="108" width="172" height="40" fill="url(#pleats)"/>
+  <rect x="42" y="148" width="172" height="12" rx="6" fill="#111"/>
+</svg>
