@@ -20,8 +20,8 @@ class HoneycombBlindsCard extends HTMLElement {
     return {
       columns: 12,
       min_columns: 12,
-      rows: 9,
-      min_rows: 7,
+      rows: 11,
+      min_rows: 11,
     };
   }
 
