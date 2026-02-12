@@ -287,11 +287,6 @@ class HoneycombBlindsCard extends HTMLElement {
           }
 
 
-          .hint {
-            margin-top: 8px;
-            font-size: 0.8rem;
-            color: var(--secondary-text-color);
-          }
         </style>
         <ha-style></ha-style>
         <ha-card>
@@ -449,19 +444,22 @@ class HoneycombBlindsCard extends HTMLElement {
 
     const buttons = [
       {
+        key: "open",
         action: "open",
         label: this._t("open"),
         top: this._config.open_top,
         bottom: this._config.open_bottom,
       },
-      { action: "stop", label: this._t("stop") },
+      { key: "stop", action: "stop", label: this._t("stop") },
       {
+        key: "close",
         action: "close",
         label: this._t("close"),
         top: this._config.close_top,
         bottom: this._config.close_bottom,
       },
       ...presets.map((preset, index) => ({
+        key: `preset-${index}`,
         action: "preset",
         label: preset.name || `${this._t("preset")} ${index + 1}`,
         index,
@@ -470,14 +468,21 @@ class HoneycombBlindsCard extends HTMLElement {
       })),
     ];
 
+    const activeKey = this._getActiveActionKey(buttons, currentTop, currentBottom);
+
     this._actionsEl.innerHTML = buttons.map((btn) => {
-      const selected = this._positionsMatch(currentTop, currentBottom, btn.top, btn.bottom);
+      const selected = btn.key === activeKey;
       const indexAttr = typeof btn.index === "number" ? ` data-index="${btn.index}"` : "";
       const selectedClass = selected ? " selected" : "";
       const ariaPressed = selected ? "true" : "false";
       const disabledAttr = selected ? " disabled aria-disabled=\"true\"" : "";
       return `<button type="button" class="button${selectedClass}" data-action="${btn.action}" aria-pressed="${ariaPressed}"${disabledAttr}${indexAttr}>${btn.label}<ha-ripple aria-hidden="true"></ha-ripple></button>`;
     }).join("");
+  }
+
+  _getActiveActionKey(buttons, currentTop, currentBottom) {
+    const active = buttons.find((btn) => this._positionsMatch(currentTop, currentBottom, btn.top, btn.bottom));
+    return active ? active.key : null;
   }
 
   _positionsMatch(currentTop, currentBottom, targetTop, targetBottom) {
@@ -684,43 +689,6 @@ class HoneycombBlindsCardEditor extends HTMLElement {
       cover_bottom: this._config.cover_bottom || "",
       shade_color: this._toColorArray(this._config.shade_color || "#b9a38b"),
     };
-  }
-
-  _resolveShadeColors() {
-    const fallback = { base: "#b9a38b", dark: "#a89178" };
-    const input = this._config && this._config.shade_color;
-    if (!input) return fallback;
-
-    if (Array.isArray(input) && input.length === 3) {
-      const [r, g, b] = input.map((v) => Math.max(0, Math.min(Number(v) || 0, 255)));
-      const dark = [r, g, b].map((v) => Math.max(0, Math.round(v * 0.9)));
-      return {
-        base: `rgb(${r}, ${g}, ${b})`,
-        dark: `rgb(${dark[0]}, ${dark[1]}, ${dark[2]})`,
-      };
-    }
-
-    if (typeof input === "string") {
-      const hex = input.trim();
-      const m = /^#?([0-9a-fA-F]{6})$/.exec(hex);
-      if (m) {
-        const val = m[1];
-        const r = int(val.slice(0, 2));
-        const g = int(val.slice(2, 4));
-        const b = int(val.slice(4, 6));
-        const dark = [r, g, b].map((v) => Math.max(0, Math.round(v * 0.9)));
-        return {
-          base: `rgb(${r}, ${g}, ${b})`,
-          dark: `rgb(${dark[0]}, ${dark[1]}, ${dark[2]})`,
-        };
-      }
-    }
-
-    return fallback;
-
-    function int(h) {
-      return parseInt(h, 16);
-    }
   }
 
   _render() {
