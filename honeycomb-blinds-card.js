@@ -282,7 +282,7 @@ class HoneycombBlindsCard extends HTMLElement {
             color: currentColor;
           }
 
-          .btn:active {
+          .button:active {
             transform: translateY(1px);
           }
 
@@ -398,7 +398,6 @@ class HoneycombBlindsCard extends HTMLElement {
         { name: "Midden", top: 46, bottom: 15, enabled: true },
         { name: "Onderkant gesloten", top: 46, bottom: 0, enabled: true },
       ],
-      shade_color: "#b9a38b",
       shade_color: "#b9a38b",
     };
 
@@ -642,7 +641,6 @@ class HoneycombBlindsCardEditor extends HTMLElement {
         { name: "Midden", top: 46, bottom: 15, enabled: true },
         { name: "Onderkant gesloten", top: 46, bottom: 0, enabled: true },
       ],
-      shade_color: "#b9a38b",
       shade_color: "#b9a38b",
       ...config,
     };
