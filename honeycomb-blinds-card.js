@@ -18,8 +18,8 @@ class HoneycombBlindsCard extends HTMLElement {
 
   getGridOptions() {
     return {
-      columns: 6,
-      min_columns: 6,
+      columns: 12,
+      min_columns: 12,
       rows: 9,
       min_rows: 7,
     };
@@ -284,7 +284,7 @@ class HoneycombBlindsCard extends HTMLElement {
           .button.selected:disabled {
             border-color: var(--primary-color);
             box-shadow: inset 0 0 0 1px var(--primary-color);
-            opacity: 0.7;
+            opacity: 1;
           }
 
           .button ha-ripple {
